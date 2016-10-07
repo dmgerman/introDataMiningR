@@ -1,0 +1,540 @@
+#+STARTUP: showall
+#+STARTUP: lognotestate
+#+TAGS:
+#+SEQ_TODO: TODO STARTED DONE DEFERRED CANCELLED | WAITING DELEGATED APPT
+#+DRAWERS: HIDDEN STATE
+#+TITLE: Intro to R and data mining
+#+CATEGORY: 
+#+PROPERTY: header-args:sql             :engine postgresql  :exports both :cmdline csc370
+#+PROPERTY: header-args:sqlite          :db /path/to/db  :colnames yes
+#+PROPERTY: header-args:C++             :results output :flags -std=c++14 -Wall --pedantic -Werror
+#+PROPERTY: header-args:R               :results output  :colnames yes
+
+
+* R
+
+This is a very simple intro to Data Mining in R.
+
+It is based on [[http://researchswinger.org/others/Rdatamining.pdf][R Data Mining]] by Yanchang Zhao. 
+
+
+* Iris dataset
+
+[[./iris.jpg]]
+
+
+#+BEGIN_SRC R :results output :columns no :exports both
+str(iris)
+#+END_SRC  
+
+#+RESULTS:
+#+begin_example
+'data.frame':	150 obs. of  5 variables:
+ $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+ $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+#+end_example
+
+
+#+BEGIN_SRC R :columns no :exports both
+attributes(iris)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+$names
+[1] "Sepal.Length" "Sepal.Width"  "Petal.Length" "Petal.Width"  "Species"     
+
+$row.names
+  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+ [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+ [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+ [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+ [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+ [91]  91  92  93  94  95  96  97  98  99 100 101 102 103 104 105 106 107 108
+[109] 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126
+[127] 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144
+[145] 145 146 147 148 149 150
+
+$class
+[1] "data.frame"
+
+#+end_example
+
+** Get first 5 rows
+
+#+BEGIN_SRC R :colnames yes :results values :exports both
+iris[1:5,]
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+#+end_example
+
+** Get first 3 columns
+#+BEGIN_SRC R :exports both
+newiris<-iris[,1:3]
+head(newiris)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  Sepal.Length Sepal.Width Petal.Length
+1          5.1         3.5          1.4
+2          4.9         3.0          1.4
+3          4.7         3.2          1.3
+4          4.6         3.1          1.5
+5          5.0         3.6          1.4
+6          5.4         3.9          1.7
+#+end_example
+
+* Exploring data
+
+#+BEGIN_SRC R :columns no :exports both
+summary(iris)
+#+END_SRC  
+
+#+RESULTS:
+#+begin_example
+  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+ Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
+ 1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
+ Median :5.800   Median :3.000   Median :4.350   Median :1.300  
+ Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
+ 3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
+ Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
+       Species  
+ setosa    :50  
+ versicolor:50  
+ virginica :50  
+                
+                
+                
+#+end_example
+
+#+BEGIN_SRC R :exports both
+summary(iris$Petal.Length)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   1.600   4.350   3.758   5.100   6.900 
+#+end_example
+
+
+#+BEGIN_SRC R :exports both
+table(iris$Species)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example :exports both
+
+    setosa versicolor  virginica 
+        50         50         50 
+#+end_example
+
+#+begin_src R  :results graphics :file species-pie.png :width 10 :height 10 :res 150 :units cm :exports both
+pie(table(iris$Species))
+#+end_src
+
+#+RESULTS:
+[[file:species-pie.png]]
+#+begin_src R  :exports both
+var(iris$Sepal.Length)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[1] 0.6856935
+#+end_example
+
+#+begin_src R :exports both
+sapply(iris[,c(1,2,3,4)],var)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+   0.6856935    0.1899794    3.1162779    0.5810063 
+#+end_example
+
+
+
+* Plots
+
+#+begin_src R  :results graphics :file sepal-hist.png :width 10 :height 10 :res 150 :units cm :exports both
+hist(iris$Sepal.Length)
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist.png]]
+
+But histograms are misleading for continuous data
+
+#+begin_src R  :results graphics :file sepal-hist-gg.png :width 10 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(x=Sepal.Length))
+gg <- gg + geom_histogram(binwidth=0.2)
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg.png]]
+
+#+begin_src R  :results graphics :file sepal-hist-gg-density.png :width 10 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(x=Sepal.Length))
+gg <- gg + geom_density()
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-density.png]]
+
+#+begin_src R  :results graphics :file sepal-hist-gg-color.png :width 10 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(x=Sepal.Length,fill=Species))
+gg <- gg + geom_histogram(binwidth=0.2)
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-color.png]]
+
+#+begin_src R  :results graphics :file sepal-hist-gg-color-2.png :width 13 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(x=Sepal.Length,y=Sepal.Width))
+gg <- gg + geom_point(aes(color=Species))
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-color-2.png]]
+
+#+begin_src R  :results graphics :file sepal-hist-gg-color-3.png :width 13 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(x=Sepal.Length,y=Sepal.Width))
+gg <- gg + geom_point(aes(color=Petal.Length))
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-color-3.png]]
+
+#+begin_src R  :results output :exports both
+cor(iris$Sepal.Width, iris$Petal.Length)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[1] -0.4284401
+#+end_example
+
+Let's do it for all of it
+
+#+begin_src R  :results output :exports both
+res <- cor(iris[,c(1,2,3,4)])
+round(res, 2)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+             Sepal.Length Sepal.Width Petal.Length Petal.Width
+Sepal.Length         1.00       -0.12         0.87        0.82
+Sepal.Width         -0.12        1.00        -0.43       -0.37
+Petal.Length         0.87       -0.43         1.00        0.96
+Petal.Width          0.82       -0.37         0.96        1.00
+#+end_example
+
+
+
+#+begin_src R  :results graphics :file sepal-hist-gg-color-2.png :width 13 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(x=Petal.Length,y=Petal.Width))
+gg <- gg + geom_point(aes(color=Species))
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-color-2.png]]
+
+#+begin_src R  :results graphics :file sepal-hist-gg-box.png :width 13 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(Species,Petal.Length))
+gg <- gg + geom_boxplot()
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-box.png]]
+
+#+begin_src R  :results graphics :file sepal-hist-gg-box-2.png :width 13 :height 10 :res 150 :units cm :exports both
+require("ggplot2")
+gg <- ggplot(iris, aes(Species,Sepal.Width))
+gg <- gg + geom_boxplot()
+gg
+#+end_src
+
+#+RESULTS:
+[[file:sepal-hist-gg-box-2.png]]
+
+#+begin_src R  :results graphics :file all.png :width 12 :height 12 :res 150 :units cm :exports both
+pairs(iris)
+#+end_src
+
+#+RESULTS:
+[[file:all.png]]
+
+#+begin_src R  :results graphics :file 3d.png :width 15 :height 15 :res 100 :units cm :exports both
+install.packages("scatterplot3d")
+require("scatterplot3d")
+scatterplot3d(iris$Petal.Width, iris$Sepal.Length, iris$Sepal.Width)
+#+end_src
+
+#+RESULTS:
+[[file:3d.png]]
+
+
+* Let us do some data mining
+
+Decision trees
+
+#+name: dectree
+#+BEGIN_SRC R :exports both
+library(party)
+set.seed(1234) # seed the Random number generator so result is deterministic
+ind <- sample(2, nrow(iris), replace=TRUE, prob=c(0.7, 0.3))
+
+trainData <- iris[ind==1,]
+testData <- iris[ind==2,]
+
+myFormula <- Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width
+iris_ctree <- ctree(myFormula, data=trainData)
+ # check the prediction
+table(predict(iris_ctree), trainData$Species)
+#+END_SRC
+
+#+RESULTS: dectree
+#+begin_example
+            
+             setosa versicolor virginica
+  setosa         40          0         0
+  versicolor      0         37         3
+  virginica       0          1        31
+#+end_example
+
+
+#+begin_src R  :results graphics :file tree.png :width 18 :height 18 :res 100 :units cm :noweb yes :exports both
+<<dectree>>
+plot(iris_ctree)
+#plot(iris_ctree, type="simple")
+#+end_src
+
+#+RESULTS:
+[[file:tree.png]]
+
+
+** Testing the tree
+
+#+BEGIN_SRC R  :noweb yes :exports both
+<<dectree>>
+testPred <- predict(iris_ctree, newdata = testData)
+table(testPred, testData$Species)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+            
+             setosa versicolor virginica
+  setosa         40          0         0
+  versicolor      0         37         3
+  virginica       0          1        31
+            
+testPred     setosa versicolor virginica
+  setosa         10          0         0
+  versicolor      0         12         2
+  virginica       0          0        14
+#+end_example
+
+* Random forest
+
+#+name: rforest
+#+BEGIN_SRC R :exports both
+library(randomForest)
+
+set.seed(1234) # seed the Random number generator so result is deterministic
+ind <- sample(2, nrow(iris), replace=TRUE, prob=c(0.7, 0.3))
+
+trainData <- iris[ind==1,]
+testData <- iris[ind==2,]
+
+rf <- randomForest(Species ~ ., data=trainData, ntree=100, proximity=TRUE)
+#+END_SRC
+
+
+
+#+BEGIN_SRC R :noweb yes :exports both
+<<rforest>>
+table(predict(rf), trainData$Species)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+            
+             setosa versicolor virginica
+  setosa         40          0         0
+  versicolor      0         35         2
+  virginica       0          3        32
+#+end_example
+
+#+BEGIN_SRC R :noweb yes :exports both
+<<rforest>>
+print(rf)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+Call:
+ randomForest(formula = Species ~ ., data = trainData, ntree = 100,      proximity = TRUE) 
+               Type of random forest: classification
+                     Number of trees: 100
+No. of variables tried at each split: 2
+
+        OOB estimate of  error rate: 4.46%
+Confusion matrix:
+           setosa versicolor virginica class.error
+setosa         40          0         0  0.00000000
+versicolor      0         35         3  0.07894737
+virginica       0          2        32  0.05882353
+#+end_example
+
+#+BEGIN_SRC R :noweb yes :exports both
+<<rforest>>
+importance(rf)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+             MeanDecreaseGini
+Sepal.Length         7.668898
+Sepal.Width          1.537643
+Petal.Length        29.480942
+Petal.Width         35.022696
+#+end_example
+
+** Test it
+
+#+BEGIN_SRC R :noweb yes :exports both
+<<rforest>>
+irisPred <- predict(rf, newdata=testData)
+table(irisPred, testData$Species)
+m<-margin(rf,testData$Species)
+summary(m)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+            
+irisPred     setosa versicolor virginica
+  setosa         10          0         0
+  versicolor      0         12         2
+  virginica       0          0        14
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+-0.8947  0.9444  1.0000  0.8733  1.0000  1.0000 
+#+end_example
+
+Margins
+
+#+begin_src R  :results graphics :file ranMargin.png :width 12 :height 12 :res 150 :units cm :noweb yes :exports both
+<<rforest>>
+
+irisPred <- predict(rf, newdata=testData)
+m<-margin(rf,testData$Species)
+plot(m)
+#+end_src
+
+#+RESULTS:
+[[file:ranMargin.png]]
+
+* Clustering
+
+k-means clustering
+
+#+BEGIN_SRC R :exports both
+set.seed(1234)
+newiris <- iris[,c(1,2,3,4)]
+kc <- kmeans(newiris, 3)
+kc
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+K-means clustering with 3 clusters of sizes 50, 62, 38
+
+Cluster means:
+  Sepal.Length Sepal.Width Petal.Length Petal.Width
+1     5.006000    3.428000     1.462000    0.246000
+2     5.901613    2.748387     4.393548    1.433871
+3     6.850000    3.073684     5.742105    2.071053
+
+Clustering vector:
+  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [75] 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 3 3 3 3 2 3 3 3 3
+[112] 3 3 2 2 3 3 3 3 2 3 2 3 2 3 3 2 2 3 3 3 3 3 2 3 3 3 3 2 3 3 3 2 3 3 3 2 3
+[149] 3 2
+
+Within cluster sum of squares by cluster:
+[1] 15.15100 39.82097 23.87947
+ (between_SS / total_SS =  88.4 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      
+#+end_example
+
+
+#+BEGIN_SRC R :exports both
+set.seed(1234)
+newiris <- iris[,c(1,2,3,4)]
+kc <- kmeans(newiris, 3)
+table(iris$Species, kc$cluster)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+            
+              1  2  3
+  setosa     50  0  0
+  versicolor  0 48  2
+  virginica   0 14 36
+#+end_example
+
+#+begin_src R  :results graphics :file clusters.png :width 18 :height 18 :res 100 :units cm :noweb yes :exports both
+set.seed(1234)
+newiris <- iris[,c(1,2,3,4)]
+kc <- kmeans(newiris, 3)
+plot(iris[c("Sepal.Length", "Sepal.Width")], col = kc$cluster,pch=as.integer(iris$Species))
+#plot(iris[c("Sepal.Length", "Sepal.Width")], col = kc$cluster)
+points(kc$centers[,c("Sepal.Length", "Sepal.Width")], col = 1:3, pch = 8, cex=2)
+#+end_src
+
+#+RESULTS:
+[[file:clusters.png]]
+
+* Epilogue
+
+- R is a messy language
+- But it is unmatched in power for these types of problems
+
