@@ -200,15 +200,6 @@ gg
 #+RESULTS:
 [[file:sepal-hist-gg-density.png]]
 
-#+begin_src R  :results graphics :file sepal-hist-gg-color.png :width 10 :height 10 :res 150 :units cm :exports both
-require("ggplot2")
-gg <- ggplot(iris, aes(x=Sepal.Length,fill=Species))
-gg <- gg + geom_histogram(binwidth=0.2)
-gg
-#+end_src
-
-#+RESULTS:
-[[file:sepal-hist-gg-color.png]]
 
 #+begin_src R  :results graphics :file sepal-hist-gg-color-2.png :width 13 :height 10 :res 150 :units cm :exports both
 require("ggplot2")
